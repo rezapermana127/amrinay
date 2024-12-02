@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customizable Looping Timers with Minutes and Seconds</title>
+    <title>Customizable Looping Timers with Save Settings</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -73,14 +73,39 @@
 </head>
 
 <body>
-    <h1>Customizable Looping Timers (Minutes and Seconds)</h1>
+    <h1>Customizable Looping Timers (Save Settings)</h1>
     <div class="timers-container" id="timers-container"></div>
 
     <script>
         const timers = [];
         const totalTimers = 60;
-
         const timersContainer = document.getElementById('timers-container');
+
+        // Load saved settings from localStorage
+        function loadSettings() {
+            const savedTimers = JSON.parse(localStorage.getItem('timersSettings'));
+            if (savedTimers) {
+                savedTimers.forEach((savedTimer, index) => {
+                    if (savedTimer) {
+                        document.getElementById(`title-${index + 1}`).value = savedTimer.title || '';
+                        document.getElementById(`minutes-input-${index + 1}`).value = savedTimer.minutes || '';
+                        document.getElementById(`seconds-input-${index + 1}`).value = savedTimer.seconds || '';
+                    }
+                });
+            }
+        }
+
+        // Save settings to localStorage
+        function saveSettings() {
+            const savedTimers = timers.map((_, index) => {
+                return {
+                    title: document.getElementById(`title-${index + 1}`).value,
+                    minutes: document.getElementById(`minutes-input-${index + 1}`).value,
+                    seconds: document.getElementById(`seconds-input-${index + 1}`).value,
+                };
+            });
+            localStorage.setItem('timersSettings', JSON.stringify(savedTimers));
+        }
 
         // Create timers
         for (let i = 1; i <= totalTimers; i++) {
@@ -148,6 +173,12 @@
             titleInput.value = "";
             titleInput.disabled = false;
         }
+
+        // Call the loadSettings function when the page loads
+        loadSettings();
+
+        // Save settings whenever a change occurs
+        window.addEventListener('beforeunload', saveSettings);
     </script>
 </body>
 
