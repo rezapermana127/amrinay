@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customizable Looping Timers</title>
+    <title>Customizable Looping Timers with Minutes and Seconds</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -73,7 +73,7 @@
 </head>
 
 <body>
-    <h1>Customizable Looping Timers</h1>
+    <h1>Customizable Looping Timers (Minutes and Seconds)</h1>
     <div class="timers-container" id="timers-container"></div>
 
     <script>
@@ -89,7 +89,8 @@
             timerBox.innerHTML = `
         <input type="text" id="title-${i}" placeholder="Enter Title" maxlength="30">
         <h2 id="timer-${i}">00:00</h2>
-        <input type="number" id="time-input-${i}" placeholder="Minutes" min="1">
+        <input type="number" id="minutes-input-${i}" placeholder="Minutes" min="0">
+        <input type="number" id="seconds-input-${i}" placeholder="Seconds" min="0" max="59">
         <button class="start" onclick="startTimer(${i})">Start</button>
         <button class="reset" onclick="resetTimer(${i})">Reset</button>
       `;
@@ -106,16 +107,17 @@
 
         // Start individual timer
         function startTimer(timerId) {
-            const inputMinutes = parseInt(document.getElementById(`time-input-${timerId}`).value, 10);
+            const inputMinutes = parseInt(document.getElementById(`minutes-input-${timerId}`).value, 10);
+            const inputSeconds = parseInt(document.getElementById(`seconds-input-${timerId}`).value, 10);
             const title = document.getElementById(`title-${timerId}`).value || `Timer ${timerId}`;
-            if (isNaN(inputMinutes) || inputMinutes <= 0) {
-                alert("Please enter a valid time in minutes.");
+            if (isNaN(inputMinutes) || isNaN(inputSeconds) || inputMinutes < 0 || inputSeconds < 0 || inputSeconds >= 60) {
+                alert("Please enter a valid time in minutes and seconds.");
                 return;
             }
 
             const timer = timers.find(t => t.id === timerId);
             if (!timer.interval) {
-                timer.initialTime = inputMinutes * 60;
+                timer.initialTime = inputMinutes * 60 + inputSeconds;
                 timer.remainingTime = timer.initialTime;
                 document.getElementById(`timer-${timerId}`).textContent = formatTime(timer.remainingTime);
                 document.getElementById(`title-${timerId}`).value = title; // Lock title input
@@ -140,7 +142,8 @@
             timer.interval = null;
             timer.remainingTime = 0;
             document.getElementById(`timer-${timerId}`).textContent = "00:00";
-            document.getElementById(`time-input-${timerId}`).value = "";
+            document.getElementById(`minutes-input-${timerId}`).value = "";
+            document.getElementById(`seconds-input-${timerId}`).value = "";
             const titleInput = document.getElementById(`title-${timerId}`);
             titleInput.value = "";
             titleInput.disabled = false;
